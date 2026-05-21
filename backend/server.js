@@ -48,10 +48,4 @@ const db = {
             fs.writeFileSync(jsonFilePath, JSON.stringify(currentData, null, 2), 'utf8');
             return [{ insertId: newCar.id }];
         }
-        return [[]];
-    },
-    execute: async (sql, params) => {
-        const currentData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
-        return [currentData];
     }
-};
