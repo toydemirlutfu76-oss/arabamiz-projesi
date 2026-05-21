@@ -1,14 +1,13 @@
 const mysql = require('mysql2');
 
 // MySQL Veritabanı Bağlantı Havuzu
-const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',      // XAMPP veya phpMyAdmin kullanıyorsan varsayılan kullanıcı 'root'tur
-    password: '',      // Varsayılan şifre boştur kanka
-    database: 'arabamiz_db', // phpMyAdmin'de açtığımız veritabanı adı
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+// Giriş/Kayıt Veritabanı Bağlantısı (Render Ortam Değişkenlerine Uyarlandı kanka)
+const db = mysql.createConnection({
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'arabamiz_db',
+    port: process.env.DB_PORT || 3306
 });
 
 // Bağlantıyı test edip konsola yazdıralım kanka

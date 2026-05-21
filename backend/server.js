@@ -13,11 +13,13 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // MySQL Veritabanı Bağlantı Havuzu
+// MySQL Veritabanı Bağlantı Havuzu (Render Ortam Değişkenlerine Uyarlandı kanka)
 const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '', 
-    database: 'arabamiz_db'
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'arabamiz_db',
+    port: process.env.DB_PORT || 3306
 });
 
 // --- MULTER DOSYA YÜKLEME AYARLARI ---
