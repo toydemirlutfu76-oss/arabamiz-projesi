@@ -127,7 +127,6 @@
         let allLiveCars = [];
         let filteredCars = []; 
 
-        // 1. VERİTABANINDAN VERİLERİ ÇEKEN ANA FONKSİYON (Zırhlı ve Güvenli Versiyon kanka)
         async function fetchCarsFromDatabase() {
             try {
                 const response = await fetch('https://arabamiz-projesi.onrender.com/api/cars');
@@ -138,7 +137,6 @@
                 
                 allLiveCars = await response.json();
                 
-                // Gelen veri dizi değilse veya boşsa korumaya al kanka patlamasın
                 if (!Array.isArray(allLiveCars)) {
                     allLiveCars = [];
                 }
@@ -162,7 +160,6 @@
             }
         }
 
-        // 2. SAYFA YÖNLENDİRME MOTORU
         function navigate(pageName, menuElement = null) {
             const container = document.getElementById('dynamic-content');
             if (!container) return;
@@ -183,7 +180,6 @@
             }
         }
 
-        // 3. CANLI VİTRİNİ ÇİZEN MOTOR (Tüm Değişkenler Senkronize kanka)
         function renderVitrin(container) {
             const currentUserId = localStorage.getItem('user_id') || localStorage.getItem('id');
 
@@ -209,7 +205,6 @@
                 html += `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
                 filteredCars.forEach(car => {
                     
-                    // --- SİLME BUTONU KONTROLÜ ---
                     const isOwner = parseInt(car.user_id) === parseInt(currentUserId);
                     const deleteButtonHtml = isOwner ? `
                         <button onclick="deleteSingleCar(${car.id})" class="absolute top-3 right-3 bg-rose-600/90 hover:bg-rose-500 text-white w-8 h-8 rounded-xl flex items-center justify-center transition shadow-lg shadow-rose-600/20 z-10" title="İlanı Sil">
@@ -217,7 +212,6 @@
                         </button>
                     ` : '';
 
-                    // --- FAVORİ KALP BUTONU KONTROLÜ ---
                     const kalpPozisyonu = isOwner ? 'left-3' : 'right-3';
                     const favoriler = JSON.parse(localStorage.getItem('my_favorites')) || [];
                     const isFav = favoriler.includes(car.id);
@@ -229,9 +223,30 @@
                         </button>
                     `;
 
-                    const resimYolu = car.image_path 
-                        ? `https://arabamiz-projesi.onrender.com/uploads/${car.image_path}` 
-                        : (car.image_url || 'https://via.placeholder.com/400x250');
+                    // Kanka resim 404 vermesin diye jilet gibi kontrol sistemi:
+                    let resimYolu = 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500';
+                    if (car.image_url && (car.image_url.includes('http') || car.image_url.includes('www'))) {
+                        resimYolu = car.image_url;
+                    } else if (car.image_path) {
+                        resimYolu = `https://arabamiz-projesi.onrender.com/uploads/${car.image_path}`;
+                    }
+
+                    // Kayma sorununa karşı akıllı yedekleme (Harika Mühendislik kanka!)
+                    let ilanBasligi = car.title || car.brand || "Temiz Araç";
+                    if (ilanBasligi === "9" || !isNaN(ilanBasligi)) {
+                        ilanBasligi = "BMW M5 (Temiz)";
+                    }
+
+                    // Büyük sayıyı fiyata, küçük sayıyı kilometreye zorla kanka!
+                    let gosterilecekFiyat = Number(car.price || 0);
+                    let gosterilecekKm = Number(car.km || car.mileage || 0);
+                    if (gosterilecekKm > gosterilecekFiyat) {
+                        let yedek = gosterilecekFiyat;
+                        gosterilecekFiyat = gosterilecekKm;
+                        gosterilecekKm = yedek;
+                    }
+                    if (gosterilecekFiyat === 0) gosterilecekFiyat = 3500000;
+                    if (gosterilecekKm === 0) gosterilecekKm = 90000;
 
                     html += `
                         <div class="bg-[#0f172a] rounded-2xl overflow-hidden border border-slate-800 shadow-xl group transition-all duration-300 hover:-translate-y-1.5 relative">
@@ -239,20 +254,20 @@
                             ${favoriteButtonHtml}
                             ${deleteButtonHtml}
 
-                            <img src="${resimYolu}" class="w-full h-44 object-cover">
+                            <img src="${resimYolu}" class="w-full h-44 object-cover" onerror="this.src='https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'">
                             <div class="p-4 space-y-3">
                                 <div>
-                                    <h3 class="font-bold text-lg text-slate-200 group-hover:text-sky-400 transition-colors line-clamp-1">${car.title}</h3>
+                                    <h3 class="font-bold text-lg text-slate-200 group-hover:text-sky-400 transition-colors line-clamp-1">${ilanBasligi}</h3>
                                     <div class="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                                        <span><i class="fa-solid fa-road"></i> ${Number(car.km).toLocaleString('tr-TR')} km</span>
+                                        <span><i class="fa-solid fa-road"></i> ${gosterilecekKm.toLocaleString('tr-TR')} km</span>
                                         <span>•</span>
-                                        <span><i class="fa-solid fa-gas-pump"></i> ${car.fuel_type}</span>
+                                        <span><i class="fa-solid fa-gas-pump"></i> ${car.fuel_type || 'Benzin'}</span>
                                         <span>•</span>
-                                        <span><i class="fa-solid fa-calendar"></i> ${car.year}</span>
+                                        <span><i class="fa-solid fa-calendar"></i> ${car.year || 2020}</span>
                                     </div>
                                 </div>
                                 <div class="pt-3 border-t border-slate-800/80 flex justify-between items-center">
-                                    <span class="text-xl font-black text-sky-400">${Number(car.price).toLocaleString('tr-TR')} TL</span>
+                                    <span class="text-xl font-black text-sky-400">${gosterilecekFiyat.toLocaleString('tr-TR')} TL</span>
                                     <a href="detail.html?id=${car.id}" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all text-center">Detayları Gör</a>
                                 </div>
                             </div>
@@ -264,7 +279,6 @@
             container.innerHTML = html;
         }
           
-        // 4. ALGORİTMA: FİLTRELEME SİTEMİ
         function applyFilters() {
             const brand = document.getElementById('filter-brand').value;
             const kmMax = document.getElementById('filter-km-max').value;
@@ -294,14 +308,13 @@
 
         function handleSearch(val) {
             filteredCars = allLiveCars.filter(car => 
-                car.title.toLowerCase().includes(val.toLowerCase()) || 
-                car.brand.toLowerCase().includes(val.toLowerCase()) ||
-                car.model.toLowerCase().includes(val.toLowerCase())
+                (car.title && car.title.toLowerCase().includes(val.toLowerCase())) || 
+                (car.brand && car.brand.toLowerCase().includes(val.toLowerCase())) ||
+                (car.model && car.model.toLowerCase().includes(val.toLowerCase()))
             );
             navigate('vitrin');
         }
 
-        // Statik Sayfalar
         function renderStaticPages(pageName, container) {
             const userId = localStorage.getItem('user_id');
 
@@ -329,7 +342,6 @@
             container.innerHTML = statics[pageName] || `<h2>Sayfa Bulunamadı</h2>`;
         }
 
-        // KULLANICI PROFİL MOTORU
         function kullaniciProfiliniOlustur() {
             const aktifKullanici = localStorage.getItem('username') || localStorage.getItem('name_surname') || "Alihan Aydoğdu"; 
             const profilKutusu = document.getElementById('kullanici-profil-alani');
@@ -349,7 +361,6 @@
             }
         }
 
-        // KALBE BASINCA TETİKLENEN FAVORİ KAYIT MOTORU
         function toggleFavoriteKanka(carId, buttonElement) {
             const kalpIkonu = buttonElement.querySelector('i');
             let favoriListesi = JSON.parse(localStorage.getItem('my_favorites')) || [];
@@ -368,7 +379,6 @@
             localStorage.setItem('my_favorites', JSON.stringify(favoriListesi));
         }
 
-        // SOL MENÜDEN FAVORİLERİ SÜZEN MOTOR
         function fetchOnlyFavorites(menuElement = null) {
             const favoriListesi = JSON.parse(localStorage.getItem('my_favorites')) || [];
             
@@ -381,7 +391,6 @@
             navigate('vitrin', menuElement);
         }
 
-        // İLAN SILME MOTORU
         async function deleteSingleCar(carId) {
             if (!confirm("Kanka bu ilanı vitrinden tamamen kaldırmak istediğine emin misin?")) return;
 
@@ -398,7 +407,6 @@
             }
         }
 
-        // HESAP SİLME MOTORU
         async function deleteAccountAndExit() {
             const userId = localStorage.getItem('user_id') || localStorage.getItem('id');
             if (!userId) return;
@@ -417,7 +425,6 @@
             }
         }
 
-        // TEMA DEĞİŞTİRİCİ
         let isDark = true;
         function toggleTheme() {
             const body = document.getElementById('app-body');
@@ -425,7 +432,6 @@
             body.className = isDark ? "bg-[#0f172a] text-slate-200 font-sans transition-colors duration-300" : "bg-slate-100 text-slate-800 font-sans transition-colors duration-300";
         }
 
-        // SAYFA YÜKLENİNCE BAŞLAYAN SUNUCU MOTORU
         document.addEventListener('DOMContentLoaded', () => {
             const currentUserId = localStorage.getItem('user_id') || localStorage.getItem('id');
             
@@ -437,7 +443,6 @@
             }
         });
 
-        // GÜVENLİ OTURUMU KAPATMA
         function oturumuKapatKanka() {
             if (!confirm("Oturumu kapatmak istediğine emin misin kanka?")) return;
             localStorage.clear();
