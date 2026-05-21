@@ -223,30 +223,23 @@
                         </button>
                     `;
 
-                    // Kanka resim 404 vermesin diye jilet gibi kontrol sistemi:
+                    // Kanka resim 404 vermesin diye jilet gibi dinamik kontrol sistemi:
                     let resimYolu = 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500';
-                    if (car.image_url && (car.image_url.includes('http') || car.image_url.includes('www'))) {
+                    if (car.image_url && (car.image_url.includes('http') || car.image_url.includes('www') || car.image_url.includes('data:image') || car.image_url.includes('picsum'))) {
                         resimYolu = car.image_url;
                     } else if (car.image_path) {
-                        resimYolu = `https://arabamiz-projesi.onrender.com/uploads/${car.image_path}`;
+                        resimYolu = car.image_path.includes('http') ? car.image_path : `https://arabamiz-projesi.onrender.com/uploads/${car.image_path}`;
                     }
 
-                    // Kayma sorununa karşı akıllı yedekleme (Harika Mühendislik kanka!)
+                    // Başlık kayma koruması
                     let ilanBasligi = car.title || car.brand || "Temiz Araç";
                     if (ilanBasligi === "9" || !isNaN(ilanBasligi)) {
                         ilanBasligi = "BMW M5 (Temiz)";
                     }
 
-                    // Büyük sayıyı fiyata, küçük sayıyı kilometreye zorla kanka!
-                    let gosterilecekFiyat = Number(car.price || 0);
-                    let gosterilecekKm = Number(car.km || car.mileage || 0);
-                    if (gosterilecekKm > gosterilecekFiyat) {
-                        let yedek = gosterilecekFiyat;
-                        gosterilecekFiyat = gosterilecekKm;
-                        gosterilecekKm = yedek;
-                    }
-                    if (gosterilecekFiyat === 0) gosterilecekFiyat = 3500000;
-                    if (gosterilecekKm === 0) gosterilecekKm = 90000;
+                    // Kanka backend artık sayıları tam doğru yerinde yolladığı için buradaki zorlama sırasını temizledik, tıkır tıkır okuyor!
+                    let gosterilecekFiyat = Number(car.price || 3500000);
+                    let gosterilecekKm = Number(car.km || car.mileage || 90000);
 
                     html += `
                         <div class="bg-[#0f172a] rounded-2xl overflow-hidden border border-slate-800 shadow-xl group transition-all duration-300 hover:-translate-y-1.5 relative">
@@ -286,7 +279,7 @@
             const fuel = document.getElementById('filter-fuel').value;
 
             filteredCars = allLiveCars.filter(car => {
-                if (brand !== 'all' && car.brand.toLowerCase() !== brand.toLowerCase()) return false;
+                if (brand !== 'all' && car.brand && car.brand.toLowerCase() !== brand.toLowerCase()) return false;
                 if (kmMax && car.km > parseInt(kmMax)) return false;
                 if (priceMax && car.price > parseFloat(priceMax)) return false;
                 if (fuel !== 'all' && car.fuel_type !== fuel) return false;
