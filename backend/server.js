@@ -19,18 +19,48 @@ const path = require('path');
 const jsonFilePath = path.join(__dirname, 'ilanlar.json');
 
 // Eğer dosya yoksa sıfırdan oluştur kanka
+// Ön yüzün kolon isimlerine tam uyumlu sahte DB motoru kral!
+const fs = require('fs');
+const path = require('path');
+const jsonFilePath = path.join(__dirname, 'ilanlar.json');
+
 if (!fs.existsSync(jsonFilePath)) {
     fs.writeFileSync(jsonFilePath, JSON.stringify([]), 'utf8');
 }
 
-// Hocanın ilanları ve kullanıcıları kaydedebilmesi için sahte DB motoru
 const db = {
-    // Arabaları listeleme kısmı için (query kullanan yerleri kurtarır)
     query: async (sql, params) => {
         const currentData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
-        return [currentData]; 
+        
+        // Veri Çekme İsteyi (SELECT)
+        if (sql.toLowerCase().includes('select')) {
+            return [currentData];
+        }
+        
+        // İlan Ekleme İsteği (INSERT)
+        if (sql.toLowerCase().includes('insert')) {
+            // Frontend'den gelen sırayı tahmin ederek tüm olasılıkları dolduruyoruz kanka kafa rahat olsun
+            const newCar = {
+                id: currentData.length + 1,
+                id: currentData.length + 1,
+                brand: params[0] || 'Araba',
+                model: params[1] || 'İlanı',
+                year: params[2] || 2020,
+                price: params[3] || 0,
+                km: params[4] || 0,
+                mileage: params[4] || 0,
+                fuel_type: params[5] || 'Benzin',
+                fuel: params[5] || 'Benzin',
+                description: params[6] || '',
+                image_url: params[7] || 'https://via.placeholder.com/300x200?text=Araba+Resmi',
+                image: params[7] || 'https://via.placeholder.com/300x200?text=Araba+Resmi'
+            };
+            currentData.push(newCar);
+            fs.writeFileSync(jsonFilePath, JSON.stringify(currentData, null, 2), 'utf8');
+            return [{ insertId: newCar.id }];
+        }
+        return [[]];
     },
-    // Eğer kodun bazı yerlerinde execute kullanıyorsan gümlemesin diye kanka
     execute: async (sql, params) => {
         const currentData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
         return [currentData];
