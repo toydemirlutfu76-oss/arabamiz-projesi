@@ -15,25 +15,23 @@ const db = {
         }
         
         if (sql.toLowerCase().includes('insert')) {
-            // Kanka formdan gelen verilerin sırası kaymasın diye akıllı eşitleme yapıyoruz:
-            // params içindeki sayıları ve metinleri türlerine göre ayıklayıp doğru yerlere koyuyoruz
-            const sayilar = params.filter(p => typeof p === 'number' || !isNaN(p));
-            const metinler = params.filter(p => typeof p === 'string' && isNaN(p));
-
+            // Kanka senin ön yüz formundan gelen elemanların sırasını milimetrik dizdik:
+            // params[0]: brand/title, params[1]: model, params[2]: year, params[3]: price, params[4]: km...
             const newCar = {
                 id: currentData.length + 1,
-                // Eğer metin varsa ilkini marka yap, yoksa varsayılan isim ver
-                brand: metinler[0] || 'Araba İlanı',
-                model: metinler[1] || 'Model',
-                description: metinler[2] || 'Temiz araç',
-                // Resim linki olabilecek en uzun metni veya son metni seçiyoruz
-                image_url: metinler.find(m => m.includes('http') || m.includes('.') || m.includes('/') || m.length > 10) || 'https://via.placeholder.com/300x200?text=Araba+Resmi',
-                // Sayılardan büyük olanı fiyat, küçük olanı kilometre yapıyoruz (Mühendislik zekası kanka!)
-                price: sayilar.length > 1 ? Math.max(...sayilar.map(Number)) : (sayilar[0] || 500000),
-                km: sayilar.length > 1 ? Math.min(...sayilar.map(Number)) : (sayilar[1] || 120000),
-                mileage: sayilar.length > 1 ? Math.min(...sayilar.map(Number)) : (sayilar[1] || 120000),
-                year: 2020,
-                fuel_type: 'Benzin'
+                brand: params[0] || 'BMW',
+                title: params[0] || 'BMW',
+                model: params[1] || 'M5',
+                year: params[2] || 2020,
+                // Büyük sayıyı fiyata, küçük sayıyı kilometreye zorla kanka!
+                price: params[3] ? Math.max(Number(params[3]), Number(params[4] || 0)) : 3500000,
+                km: params[4] ? Math.min(Number(params[3]), Number(params[4])) : 90000,
+                mileage: params[4] ? Math.min(Number(params[3]), Number(params[4])) : 90000,
+                fuel_type: params[5] || 'Benzin',
+                gear_type: params[6] || 'Otomatik',
+                description: params[7] || 'Çok temiz, boyasız araç.',
+                // Eğer kırık resim geliyorsa direkt varsayılan araba resmi bas kanka
+                image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'
             };
             
             currentData.push(newCar);
