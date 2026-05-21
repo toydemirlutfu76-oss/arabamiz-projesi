@@ -127,9 +127,13 @@
         let allLiveCars = [];
         let filteredCars = []; 
 
+        // Kanka backend portun kaç ise burayı ona göre ayarlayabilirsin (Örn: 3000 veya 5000)
+        const LOCAL_API_URL = 'http://localhost:5000'; 
+
         async function fetchCarsFromDatabase() {
             try {
-                const response = await fetch('https://arabamiz-projesi.onrender.com/api/cars');
+                // Kanka istek adresini senin kendi yerel node sunucuna çevirdik!
+                const response = await fetch(`${LOCAL_API_URL}/api/cars`);
                 
                 if (!response.ok) {
                     throw new Error(`Sunucu hatası: ${response.status}`);
@@ -142,7 +146,7 @@
                 }
                 
                 filteredCars = [...allLiveCars]; 
-                console.log("Veritabanından başarıyla çekilen ilanlar kanka:", allLiveCars);
+                console.log("Localhost veritabanından başarıyla çekilen ilanlar kanka:", allLiveCars);
                 
                 navigate('vitrin');
             } catch (error) {
@@ -152,8 +156,8 @@
                 document.getElementById('dynamic-content').innerHTML = `
                     <div class="text-center py-20 bg-[#0f172a] rounded-2xl border border-slate-800">
                         <i class="fa-solid fa-triangle-exclamation text-5xl text-amber-500 mb-3"></i>
-                        <h3 class="text-lg font-bold text-slate-300">Sunucu Bağlantı Hatası veya Erişim Reddi!</h3>
-                        <p class="text-xs text-slate-500 mt-2">Arka uç şifre doğrulaması (Access Denied) aşamasında kalmış olabilir kanka.</p>
+                        <h3 class="text-lg font-bold text-slate-300">Yerel Sunucuya Bağlanılamadı!</h3>
+                        <p class="text-xs text-slate-500 mt-2">Kanka terminalde backend klasörünün içinde 'node server.js' komutunu çalıştırmayı unutmuş olabilirsin.</p>
                         <p class="text-[11px] text-rose-400 mt-1 bg-rose-500/10 p-2 rounded-xl inline-block border border-rose-500/20">Detay: ${error.message}</p>
                     </div>
                 `;
@@ -187,7 +191,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-2xl font-black tracking-tight text-white">Vitrindeki Canlı İlanlar</h2>
-                        <p class="text-sm text-slate-400 mt-0.5">Veritabanından anlık çekilen gerçek araçlar.</p>
+                        <p class="text-sm text-slate-400 mt-0.5">Kendi bilgisayarından anlık çekilen gerçek araçlar.</p>
                     </div>
                     <span class="text-xs bg-[#0f172a] text-slate-400 px-3 py-1.5 rounded-full border border-slate-800">Toplam ${filteredCars.length} İlan</span>
                 </div>
@@ -223,23 +227,17 @@
                         </button>
                     `;
 
-                    // Kanka resim 404 vermesin diye jilet gibi dinamik kontrol sistemi:
+                    // Kanka resimlerin localhost klasöründen düzgün okunması için ayarlama:
                     let resimYolu = 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500';
-                    if (car.image_url && (car.image_url.includes('http') || car.image_url.includes('www') || car.image_url.includes('data:image') || car.image_url.includes('picsum'))) {
+                    if (car.image_url && (car.image_url.includes('http') || car.image_url.includes('www') || car.image_url.includes('data:image'))) {
                         resimYolu = car.image_url;
                     } else if (car.image_path) {
-                        resimYolu = car.image_path.includes('http') ? car.image_path : `https://arabamiz-projesi.onrender.com/uploads/${car.image_path}`;
+                        resimYolu = car.image_path.includes('http') ? car.image_path : `${LOCAL_API_URL}/uploads/${car.image_path}`;
                     }
 
-                    // Başlık kayma koruması
                     let ilanBasligi = car.title || car.brand || "Temiz Araç";
-                    if (ilanBasligi === "9" || !isNaN(ilanBasligi)) {
-                        ilanBasligi = "BMW M5 (Temiz)";
-                    }
-
-                    // Kanka backend artık sayıları tam doğru yerinde yolladığı için buradaki zorlama sırasını temizledik, tıkır tıkır okuyor!
-                    let gosterilecekFiyat = Number(car.price || 3500000);
-                    let gosterilecekKm = Number(car.km || car.mileage || 90000);
+                    let gosterilecekFiyat = Number(car.price || 0);
+                    let gosterilecekKm = Number(car.km || car.mileage || 0);
 
                     html += `
                         <div class="bg-[#0f172a] rounded-2xl overflow-hidden border border-slate-800 shadow-xl group transition-all duration-300 hover:-translate-y-1.5 relative">
@@ -314,7 +312,7 @@
             const statics = {
                 'ilanlarim': `<h2 class="text-xl font-bold mb-4 text-purple-400">Yayındaki İlanlarım</h2><p class="text-xs text-slate-400">Bu alan geliştirme aşamasındadır kanka.</p>`,
                 'ayarlar': `
-                    <h2 class="text-xl font-bold mb-2 text-blue-400">Sistem and Profil Ayarları</h2>
+                    <h2 class="text-xl font-bold mb-2 text-blue-400">Sistem ve Profil Ayarları</h2>
                     <p class="text-xs text-slate-400 mb-6">Profilinizi bu alandan yönetebilir veya güncelleyebilirsiniz kanka.</p>
                     
                     <div class="bg-[#0f172a] p-6 rounded-2xl border border-slate-800/80 space-y-4 max-w-md">
@@ -322,7 +320,7 @@
                             <i class="fa-solid fa-triangle-exclamation"></i> Tehlikeli Bölge
                         </h3>
                         <p class="text-xs text-slate-400 leading-relaxed">
-                            Hesabınızı kapattığınızda veritabanındaki tüm profil bilgileriniz ve yayınlamış olduğunuz tüm araç ilanları kalıcı olarak silinecektir. Bu işlem geri alınamaz kanka!
+                            Hesabınızı kapattığınızda veritabanındaki tüm profil bilgileriniz ve yayınlamış olduğunuz tüm araç ilanları kalıcı olarak silinecektir kanka!
                         </p>
                         <div class="pt-2">
                             <button onclick="deleteAccountAndExit(${userId})" class="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition shadow-lg shadow-rose-600/10 flex items-center gap-2">
@@ -388,9 +386,9 @@
             if (!confirm("Kanka bu ilanı vitrinden tamamen kaldırmak istediğine emin misin?")) return;
 
             try {
-                const response = await fetch(`https://arabamiz-projesi.onrender.com/api/cars/${carId}`, { method: 'DELETE' });
+                const response = await fetch(`${LOCAL_API_URL}/api/cars/${carId}`, { method: 'DELETE' });
                 if (response.ok) {
-                    alert("🚀 İlan başarıyla veritabanından söküldü kanka!");
+                    alert("🚀 İlan başarıyla yerel veritabanından söküldü kanka!");
                     fetchCarsFromDatabase();
                 } else {
                     alert("❌ Silme başarısız.");
@@ -407,7 +405,7 @@
             if (!confirm("⚠️ Hesabını ve tüm ilanlarını kalıcı olarak silmek istediğinden emin misin kanka?")) return; 
 
             try {
-                const response = await fetch(`https://arabamiz-projesi.onrender.com/api/delete-account/${userId}`, { method: 'DELETE' });
+                const response = await fetch(`${LOCAL_API_URL}/api/delete-account/${userId}`, { method: 'DELETE' });
                 if (response.ok) {
                     alert("🚀 Hesap başarıyla kapatıldı kanka.");
                     localStorage.clear();
