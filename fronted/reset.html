@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifremi Yenile - arabamız.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-input {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: #38bdf8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen flex items-center justify-center px-4">
+
+    <div class="max-w-md w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-white tracking-wide">
+                arabamız<span class="text-red-500">.</span>
+            </h1>
+            <p class="text-slate-400 text-sm mt-1">Yeni şifreni belirle kanka.</p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 space-y-6">
+            <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-key"></i> Şifremi Yenile
+            </h2>
+
+            <form id="resetForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium mb-1.5 text-slate-300">Kayıtlı E-Posta Adresiniz</label>
+                    <input type="email" id="resetEmail" required placeholder="alihan76@gmail.com" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1.5 text-slate-300">Yeni Şifreniz</label>
+                    <input type="password" id="resetPassword" required placeholder="••••••••" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                </div>
+
+                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-amber-500/20 transition duration-300 text-sm">
+                    Şifremi Güncelle Kanka
+                </button>
+            </form>
+
+            <div class="text-center border-t border-slate-700/60 pt-4">
+                <p class="text-xs text-slate-400">
+                    Hatırladın mı? 
+                    <a href="login.html" class="text-sky-400 hover:underline font-medium ml-1">Giriş Yap</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('resetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            const newPassword = document.getElementById('resetPassword').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, newPassword })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert("🚀 Başarılı kanka! Yeni şifren veritabanında güncellendi. Giriş yapabilirsin.");
+                    window.location.href = 'login.html';
+                } else {
+                    alert("❌ Hata kanka: " + data.error);
+                }
+            } catch (err) {
+                alert("Backend sunucusu açık mı kanka? Hata: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

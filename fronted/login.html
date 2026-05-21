@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - arabamız.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
+        }
+        .glass-input {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen flex items-center justify-center px-4">
+
+    <div class="max-w-md w-full">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-black text-white tracking-wide">
+                arabamız<span class="text-red-500">.</span>
+            </h1>
+            <p class="text-slate-400 text-xs mt-1.5 uppercase tracking-widest">Kanka Giriş Paneline Hoş Geldin</p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 space-y-6">
+            <div class="flex items-center gap-2.5 border-b border-slate-700/40 pb-4">
+                <i class="fa-solid fa-user-shield text-sky-400 text-xl"></i>
+                <h2 class="text-lg font-bold text-white">Sürücü Girişi</h2>
+            </div>
+
+            <form id="secureLoginForm" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold mb-1.5 text-slate-300 uppercase tracking-wider">E-Posta Adresi</label>
+                    <input type="email" id="userEmail" required placeholder="alihan76@gmail.com" class="glass-input w-full rounded-xl px-4 py-3.5 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1.5 text-slate-300 uppercase tracking-wider">Şifre</label>
+                    <input type="password" id="userPassword" autocomplete="current-password" required placeholder="••••••••" class="glass-input w-full rounded-xl px-4 py-3.5 text-sm">
+                </div>
+
+                <button type="submit" class="w-full mt-2 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-sky-500/20 transition-all duration-300 text-sm tracking-wide">
+                    Sisteme Giriş Yap Kanka 🚀
+                </button>
+            </form>
+
+            <div class="text-center border-t border-slate-700/40 pt-4 space-y-2">
+                <p class="text-xs text-slate-400">
+                    Hesabın yok mu kanka? 
+                    <a href="./register.html" class="text-sky-400 hover:underline font-bold ml-1">Kayıt Ol</a>
+                </p>
+                <p class="text-xs">
+                    <a href="./reset.html" class="text-amber-400 hover:underline font-medium">Şifremi Unuttum kanka?</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('secureLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Kanka iki ismi de hafızaya mühürlüyoruz ki diğer sayfalar asla patlamasın!
+                    localStorage.setItem('user_id', data.user.id);
+                    localStorage.setItem('id', data.user.id);
+                    localStorage.setItem('username', data.user.name_surname);
+
+                    alert(`🚀 Giriş başarılı kral! Hoş geldin ${data.user.name_surname}`);
+                    
+                    // Tam klasör yolu yönlendirmesi kanka, beyaz ekranı bitiren dokunuş!
+                    window.location.href = './index.html';
+                } else {
+                    alert("❌ Giriş Başarısız kanka: " + data.error);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Backend sunucusu şu an açık mı kanka? Terminali kontrol et.");
+            }
+        });
+    </script>
+</body>
+</html>

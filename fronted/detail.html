@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>arabamız. - Dinamik Araç Detayı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-[#111827] text-gray-200 font-sans min-h-screen">
+
+    <nav class="border-b border-gray-800 bg-[#1f2937] px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-2xl font-bold text-white tracking-wide">
+                <a href="index.html" class="hover:text-sky-400 transition">arabamız<span class="text-red-500">.</span></a>
+            </div>
+            <div class="text-sm bg-gray-800 px-4 py-2 rounded-lg border border-gray-700">
+                <i class="fa-solid fa-car-side text-red-500 mr-2"></i> Araç Detay Paneli
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <div class="lg:col-span-3 space-y-6">
+            
+            <h1 id="dynamic-title" class="text-2xl font-bold text-white tracking-tight">Yükleniyor...</h1>
+
+            <div class="relative bg-[#1f2937] p-4 rounded-xl border border-gray-800 group">
+                <div class="relative h-64 md:h-96 overflow-hidden rounded-lg" id="slider-wrapper">
+                    <div class="text-center py-20 text-gray-400">Görseller yükleniyor kanka...</div>
+                </div>
+
+                <button id="prevBtn" class="absolute left-6 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center border border-gray-700 transition">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button id="nextBtn" class="absolute right-6 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center border border-gray-700 transition">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+
+                <div class="flex justify-center space-x-2 mt-4" id="dotContainer"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="space-y-4">
+                    <div class="bg-[#1f2937] p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400 uppercase tracking-wider">Satış Fiyatı</p>
+                        <p id="dynamic-price" class="text-2xl font-bold text-emerald-400 mt-1">Yükleniyor...</p>
+                        <p id="dynamic-price-sub" class="text-xs text-gray-500 mt-2">Sayaç Sabit Fiyatı: Yükleniyor...</p>
+                    </div>
+
+                    <div class="bg-[#1f2937] p-4 rounded-xl border border-gray-800 space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <div class="bg-gray-800 p-2 rounded-lg text-gray-400">
+                                <i class="fa-solid fa-user-tie text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Satıcı Bilgileri</p>
+                                <p id="dynamic-seller-name" class="text-sm font-semibold text-white">Alihan Aydoğdu</p>
+                                <p class="text-xs text-gray-500">Üyelik Tarihi: 2026</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#1f2937] p-5 rounded-xl border border-gray-800 flex flex-col justify-between">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-emerald-500/10 p-3 rounded-lg border border-emerald-500/20">
+                            <i class="fa-solid fa-hand-holding-dollar text-emerald-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-semibold flex items-center gap-2">
+                                <i class="fa-solid fa-comments-dollar text-sm"></i> Teklifini İletin
+                            </h3>
+                            <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                                Araç için düşündüğünüz fiyatı girin. Teklifiniz anlık olarak satıcı ekranına iletilecektir.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 space-y-3">
+                        <div class="flex gap-2">
+                            <input type="number" id="offerInput" placeholder="Teklif Tutarınız (TL)" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                            <button id="sendOfferBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-4 rounded-lg transition">Gönder</button>
+                        </div>
+                        <p id="offerStatus" class="text-[11px] text-gray-500 italic transition-all duration-300">
+                            Giriş yaptıktan sonra teklif gönderdiğiniz araç satıcı panelinden onaylanabilir veya reddedebilir.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-[#1f2937] p-5 rounded-xl border border-gray-800">
+                <h3 class="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Teknik Özellikler</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="flex items-center space-x-3 bg-[#111827] p-3 rounded-lg border border-gray-800">
+                        <i class="fa-solid fa-calendar text-red-400"></i>
+                        <div>
+                            <p class="text-[11px] text-gray-400">Model Yılı</p>
+                            <p id="spec-year" class="text-sm font-bold text-white">-</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 bg-[#111827] p-3 rounded-lg border border-gray-800">
+                        <i class="fa-solid fa-gauge text-blue-400"></i>
+                        <div>
+                            <p class="text-[11px] text-gray-400">Kilometre</p>
+                            <p id="spec-km" class="text-sm font-bold text-white">-</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3 bg-[#111827] p-3 rounded-lg border border-gray-800">
+                        <i class="fa-solid fa-gas-pump text-amber-400"></i>
+                        <div>
+                            <p class="text-[11px] text-gray-400">Yakıt Türü</p>
+                            <p id="spec-fuel" class="text-sm font-bold text-white">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="space-y-4">
+            <div class="bg-[#1f2937] p-5 rounded-xl border border-gray-800 space-y-5">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Payment & Seller Information</h3>
+                
+                <div class="border-t border-gray-800 pt-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-medium text-gray-300">Satıcı Detayı</span>
+                        <span class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold">Onaylı</span>
+                    </div>
+                    <div class="flex items-center space-x-3 p-2 bg-[#111827] rounded-lg border border-gray-800">
+                        <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-gray-300 text-xs">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div>
+                            <p id="right-seller-name" class="text-xs text-white font-medium">Alihan Aydoğdu</p>
+                            <p class="text-[10px] text-gray-500">Kayıt: 2026</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-800 pt-4 space-y-3">
+                    <span class="text-xs font-medium text-gray-300 block"><i class="fa-solid fa-credit-card text-emerald-400 mr-1"></i> Kart ile Güvenli Ödeme</span>
+                    
+                    <form id="paymentForm" class="space-y-2.5">
+                        <div>
+                            <label class="text-[11px] text-gray-400 block mb-1">Kart Üzerindeki İsim</label>
+                            <input type="text" required placeholder="Ahmet Yılmaz" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-gray-400 block mb-1">Kart Numarası</label>
+                            <input type="text" maxlength="19" required id="cardNumber" placeholder="0000 0000 0000 0000" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] text-gray-400 block mb-1">Son Kul. (AA/YY)</label>
+                                <input type="text" maxlength="5" required placeholder="MM/YY" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-gray-400 block mb-1">CVC / CVC2</label>
+                                <input type="password" maxlength="3" required placeholder="***" class="w-full bg-[#111827] border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/10">
+                            <i class="fa-solid fa-lock text-[10px]"></i> <span id="dynamic-pay-btn-text">Öde</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="border-t border-gray-800 pt-3 flex items-center justify-between">
+                    <div class="flex space-x-1.5">
+                        <div class="w-8 h-8 bg-blue-950/40 border border-blue-800/40 rounded flex items-center justify-center text-blue-400 text-xs" title="Banka Transferi">
+                            <i class="fa-solid fa-bank"></i>
+                        </div>
+                        <div class="w-8 h-8 bg-blue-950/40 border border-blue-800/40 rounded flex items-center justify-center text-blue-400 text-xs" title="Güvenli Cüzdan">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="w-8 h-8 bg-emerald-950/40 border border-emerald-800/40 rounded flex items-center justify-center text-emerald-400 text-xs" title="256-Bit SSL">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded"><i class="fa-solid fa-shield"></i> 256-Bit SSL</span>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentSlide = 0;
+        let totalSlides = 0;
+        let slideImagesList = [];
+
+        async function loadLiveCarDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const carId = urlParams.get('id');
+
+            if (!carId) {
+                document.getElementById('dynamic-title').innerText = "Hata: Geçersiz İlan Linki Kanka.";
+                return;
+            }
+
+            try {
+                // 1. Backend'den o ilanın bütün bilgilerini çekiyoruz kanka
+                const response = await fetch(`http://localhost:3000/api/cars/${carId}`);
+                if (!response.ok) throw new Error("İlan veritabanında yok!");
+                const car = await response.json();
+
+                // 2. Fiyatları ve Başlığı Yerleştirme
+                const cleanPrice = Number(car.price).toLocaleString('tr-TR') + ' TL';
+                document.getElementById('dynamic-title').innerText = `${car.brand} ${car.model} - ${car.title}`;
+                document.getElementById('dynamic-price').innerText = cleanPrice;
+                document.getElementById('dynamic-price-sub').innerText = `Sayaç Sabit Fiyatı: ${cleanPrice}`;
+                document.getElementById('dynamic-pay-btn-text').innerText = `${cleanPrice} Öde`;
+
+                // 3. Teknik Özellikleri Yerleştirme
+                document.getElementById('spec-year').innerText = car.year;
+                document.getElementById('spec-km').innerText = Number(car.km).toLocaleString('tr-TR') + ' km';
+                document.getElementById('spec-fuel').innerText = car.fuel_type;
+
+                // 4. Satıcı İsimlerini Giriş Yapan Kişiye Göre Eşitleme (LocalStorage veya İlan Sahibine Göre)
+                const currentSessionUser = localStorage.getItem('username') || "Alihan Aydoğdu";
+                document.getElementById('dynamic-seller-name').innerText = currentSessionUser;
+                document.getElementById('right-seller-name').innerText = currentSessionUser;
+
+                // 5. Slider Resim Şablonunu Oluşturma
+                const sliderWrapper = document.getElementById('slider-wrapper');
+                const dotContainer = document.getElementById('dotContainer');
+                
+                // Resimleri diziye toplayalım
+                slideImagesList = [car.slider_img1, car.slider_img2, car.slider_img3].filter(url => url && url.trim() !== "");
+                totalSlides = slideImagesList.length;
+
+                sliderWrapper.innerHTML = '';
+                dotContainer.innerHTML = '';
+
+                slideImagesList.forEach((imgUrl, i) => {
+                    const opacityClass = (i === 0) ? 'opacity-100' : 'opacity-0 pointer-events-none';
+                    const labelText = (i === 0) ? 'Ön Profil' : (i === 1) ? 'Yan Detay' : 'Arka Profil';
+
+                    // Resimleri senin CSS geçiş stilinle basıyoruz kanka
+                    sliderWrapper.insertAdjacentHTML('beforeend', `
+                        <div class="slide absolute inset-0 transition-opacity duration-500 ease-in-out ${opacityClass}">
+                            <img src="${imgUrl}" alt="${labelText}" class="w-full h-full object-cover">
+                            <div class="absolute bottom-4 left-4 bg-black/60 px-3 py-1 rounded text-xs text-white">Görsel ${i + 1}: ${labelText}</div>
+                        </div>
+                    `);
+
+                    // Alt Noktalar (Dots)
+                    const bgDotClass = (i === 0) ? 'bg-white' : 'bg-gray-600';
+                    dotContainer.insertAdjacentHTML('beforeend', `
+                        <span class="dot w-2.5 h-2.5 rounded-full ${bgDotClass} cursor-pointer transition" onclick="jumpToSlide(${i})"></span>
+                    `);
+                });
+
+                initSliderControls();
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('dynamic-title').innerText = "Hata: Bu ilan veritabanından alınamadı kanka.";
+            }
+        }
+
+        // --- SLIDER GEÇİŞ MOTORU ---
+        function initSliderControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            nextBtn.addEventListener('click', () => changeSlide(currentSlide + 1));
+            prevBtn.addEventListener('click', () => changeSlide(currentSlide - 1));
+        }
+
+        function changeSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+
+            if (index >= totalSlides) currentSlide = 0;
+            else if (index < 0) currentSlide = totalSlides - 1;
+            else currentSlide = index;
+
+            slides.forEach((slide, i) => {
+                if (i === currentSlide) {
+                    slide.classList.remove('opacity-0', 'pointer-events-none');
+                    slide.classList.add('opacity-100');
+                } else {
+                    slide.classList.remove('opacity-100');
+                    slide.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                if (i === currentSlide) {
+                    dot.classList.remove('bg-gray-600');
+                    dot.classList.add('bg-white');
+                } else {
+                    dot.classList.remove('bg-white');
+                    dot.className = dot.className.replace('bg-white', 'bg-gray-600');
+                }
+            });
+        }
+
+        function jumpToSlide(index) {
+            changeSlide(index);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadLiveCarDetail);
+
+        // --- KART FORMATLAMA ---
+        const cardInput = document.getElementById('cardNumber');
+        cardInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let matches = value.match(/\d{4,16}/g);
+            let match = matches && matches[0] || '';
+            let parts = [];
+            for (let i=0, len=match.length; i<len; i+=4) {
+                parts.push(match.substring(i, i+4));
+            }
+            if (parts.length > 0) { e.target.value = parts.join(' '); } 
+            else { e.target.value = value; }
+        });
+
+        // --- ÖDEME FORMU ---
+        document.getElementById('paymentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Güvenli ödeme simülasyonu başarılı! Ödemeniz alındı.');
+        });
+
+        // --- TEKLİF MOTORU ---
+        const sendOfferBtn = document.getElementById('sendOfferBtn');
+        const offerInput = document.getElementById('offerInput');
+        const offerStatus = document.getElementById('offerStatus');
+
+        sendOfferBtn.addEventListener('click', () => {
+            const amount = offerInput.value.trim();
+            if(amount) {
+                offerStatus.innerText = `Tebrikler! ${Number(amount).toLocaleString('tr-TR')} TL tutarındaki teklifiniz satıcıya anlık olarak iletildi.`;
+                offerStatus.classList.remove('text-gray-500');
+                offerStatus.classList.add('text-emerald-400', 'not-italic', 'font-medium');
+                offerInput.value = '';
+            } else {
+                alert('Lütfen geçerli bir teklif tutarı giriniz.');
+            }
+        });
+    </script>
+</body>
+</html>

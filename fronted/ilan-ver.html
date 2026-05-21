@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Ver - arabamız.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0284c7 100%);
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-input {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+        }
+        .glass-input:focus {
+            border-color: #38bdf8;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="text-slate-200 font-sans min-h-screen py-10 px-4">
+
+    <div class="max-w-3xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <a href="index.html" class="text-xl font-bold text-white"><i class="fa-solid fa-arrow-left text-sm mr-1"></i> Vitrine Dön</a>
+            <span class="text-2xl font-black text-white">arabamız<span class="text-red-500">.</span></span>
+        </div>
+
+        <div class="glass-card rounded-3xl p-6 md:p-8 space-y-8">
+            <div>
+                <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-circle-plus text-emerald-400"></i> Yeni Araç İlanı Ekle
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Gerekli teknik özellikleri girip bilgisayarından fotoğrafları yükle kanka.</p>
+            </div>
+
+            <form id="form-add-car" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">İlan Başlığı</label>
+                        <input type="text" id="listing-title" required placeholder="Sahibinden Tertemiz M5" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Marka</label>
+                        <input type="text" id="listing-brand" required placeholder="BMW" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Model</label>
+                        <input type="text" id="listing-model" required placeholder="M5" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Model Yılı</label>
+                        <input type="number" id="listing-year" required placeholder="2021" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Kilometre (KM)</label>
+                        <input type="number" id="listing-km" required placeholder="45000" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Satış Fiyatı (TL)</label>
+                        <input type="number" id="listing-price" required placeholder="2850000" class="glass-input w-full rounded-xl px-4 py-3 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Yakıt Türü</label>
+                        <select id="listing-fuel" class="glass-input w-full rounded-xl px-4 py-3 text-sm text-white">
+                            <option value="Benzin">Benzin</option>
+                            <option value="Dizel">Dizel</option>
+                            <option value="Hibrit">Hibrit</option>
+                            <option value="Elektrik">Elektrik</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-700/50 pt-6">
+                    <h2 class="text-sm font-bold text-sky-400 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-images"></i> Bilgisayardan Görselleri Seç kanka
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs text-emerald-400 font-medium mb-1">Vitrin Ana Resmi</label>
+                            <input type="file" id="listing-image-file" accept="image/*" required class="glass-input w-full rounded-xl px-4 py-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 font-medium mb-1">Slider Görsel 1 (Ön Profil)</label>
+                            <input type="file" id="listing-slider-file1" accept="image/*" required class="glass-input w-full rounded-xl px-4 py-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 font-medium mb-1">Slider Görsel 2 (Yan Detay)</label>
+                            <input type="file" id="listing-slider-file2" accept="image/*" required class="glass-input w-full rounded-xl px-4 py-2 text-xs">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs text-slate-400 font-medium mb-1">Slider Görsel 3 (Arka Profil)</label>
+                            <input type="file" id="listing-slider-file3" accept="image/*" required class="glass-input w-full rounded-xl px-4 py-2 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-500/10 transition duration-300 text-sm">
+                    İlanı Canlıya Al Kanka 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Giriş Güvenlik Duvarı
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUserId = localStorage.getItem('user_id') || localStorage.getItem('id');
+            if (!currentUserId || currentUserId === "undefined" || currentUserId === "null") {
+                alert("🛑 Kanka dur! Giriş yapmadan ilan veremezsin. Önce giriş sayfasına yönlendiriliyorsun!");
+                window.location.href = 'login.html';
+            }
+        });
+
+        document.getElementById('form-add-car').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const currentUserId = localStorage.getItem('user_id') || localStorage.getItem('id');
+            const formData = new FormData();
+            
+            formData.append('title', document.getElementById('listing-title').value);
+            formData.append('brand', document.getElementById('listing-brand').value);
+            formData.append('model', document.getElementById('listing-model').value);
+            formData.append('year', parseInt(document.getElementById('listing-year').value));
+            formData.append('price', parseFloat(document.getElementById('listing-price').value));
+            formData.append('km', parseInt(document.getElementById('listing-km').value));
+            formData.append('fuel_type', document.getElementById('listing-fuel').value);
+            formData.append('user_id', currentUserId); 
+
+            formData.append('image_file', document.getElementById('listing-image-file').files[0]);
+            formData.append('slider_file1', document.getElementById('listing-slider-file1').files[0]);
+            formData.append('slider_file2', document.getElementById('listing-slider-file2').files[0]);
+            formData.append('slider_file3', document.getElementById('listing-slider-file3').files[0]);
+
+            try {
+                const response = await fetch('http://localhost:3000/api/cars', {
+                    method: 'POST',
+                    body: formData 
+                });
+
+                if (response.ok) {
+                    alert("🚀 MÜKEMMEL KANKA! Resimler bilgisayarından yüklendi ve ilan vitrine mühürlendi!");
+                    window.location.href = 'index.html';
+                } else {
+                    const errData = await response.json();
+                    alert("❌ İlan yüklenirken hata oluştu: " + errData.error);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Backend sunucusu açık mı kanka? Bağlantı kurulamadı.");
+            }
+        });
+    </script>
+</body>
+</html>
