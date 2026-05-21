@@ -143,7 +143,7 @@
             formData.append('slider_file3', document.getElementById('listing-slider-file3').files[0]);
 
             try {
-                const response = await fetch('http://localhost:3000/api/cars', {
+                const response = await fetch('https://arabamiz-projesi.onrender.com', {
                     method: 'POST',
                     body: formData 
                 });
