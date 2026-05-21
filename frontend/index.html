@@ -72,7 +72,7 @@
             </header>
 
             <main class="flex-1 bg-[#1e293b] rounded-2xl p-6 overflow-y-auto shadow-xl border border-slate-800" id="dynamic-content">
-                </main>
+            </main>
         </div>
 
         <aside class="w-80 bg-[#1e293b] rounded-2xl p-4 shadow-xl border border-slate-800 flex flex-col gap-4 overflow-y-auto">
@@ -127,20 +127,37 @@
         let allLiveCars = [];
         let filteredCars = []; 
 
-        // 1. VERİTABANINDAN VERİLERİ ÇEKEN ANA FONKSİYON
+        // 1. VERİTABANINDAN VERİLERİ ÇEKEN ANA FONKSİYON (Zırhlı ve Güvenli Versiyon kanka)
         async function fetchCarsFromDatabase() {
             try {
                 const response = await fetch('https://arabamiz-projesi.onrender.com/api/cars');
-                allLiveCars = await response.json();
-                filteredCars = [...allLiveCars]; 
                 
+                if (!response.ok) {
+                    throw new Error(`Sunucu hatası: ${response.status}`);
+                }
+                
+                allLiveCars = await response.json();
+                
+                // Gelen veri dizi değilse veya boşsa korumaya al kanka patlamasın
+                if (!Array.isArray(allLiveCars)) {
+                    allLiveCars = [];
+                }
+                
+                filteredCars = [...allLiveCars]; 
                 console.log("Veritabanından başarıyla çekilen ilanlar kanka:", allLiveCars);
                 
                 navigate('vitrin');
             } catch (error) {
                 console.error("Bağlantı hatası kanka:", error);
+                allLiveCars = [];
+                filteredCars = [];
                 document.getElementById('dynamic-content').innerHTML = `
-                    <p class="text-red-400 text-center py-10">Sunucu kapalı veya veritabanı bağlantısı kurulamadı kanka!</p>
+                    <div class="text-center py-20 bg-[#0f172a] rounded-2xl border border-slate-800">
+                        <i class="fa-solid fa-triangle-exclamation text-5xl text-amber-500 mb-3"></i>
+                        <h3 class="text-lg font-bold text-slate-300">Sunucu Bağlantı Hatası veya Erişim Reddi!</h3>
+                        <p class="text-xs text-slate-500 mt-2">Arka uç şifre doğrulaması (Access Denied) aşamasında kalmış olabilir kanka.</p>
+                        <p class="text-[11px] text-rose-400 mt-1 bg-rose-500/10 p-2 rounded-xl inline-block border border-rose-500/20">Detay: ${error.message}</p>
+                    </div>
                 `;
             }
         }
@@ -184,8 +201,8 @@
                 html += `
                     <div class="text-center py-20 bg-[#0f172a] rounded-2xl border border-slate-800">
                         <i class="fa-solid fa-car-burst text-5xl text-slate-600 mb-3"></i>
-                        <h3 class="text-lg font-bold text-slate-300">Aradığınız kriterde ilan bulunamadı kanka.</h3>
-                        <p class="text-xs text-slate-500 mt-1">Lütfen sağ taraftaki filtreleri sıfırlayıp tekrar deneyin.</p>
+                        <h3 class="text-lg font-bold text-slate-300">Vitrinde henüz aktif ilan yok kanka.</h3>
+                        <p class="text-xs text-slate-500 mt-1">Giriş yapıp sol menüden ilk ilanı sen ekleyebilirsin!</p>
                     </div>
                 `;
             } else {
@@ -291,7 +308,7 @@
             const statics = {
                 'ilanlarim': `<h2 class="text-xl font-bold mb-4 text-purple-400">Yayındaki İlanlarım</h2><p class="text-xs text-slate-400">Bu alan geliştirme aşamasındadır kanka.</p>`,
                 'ayarlar': `
-                    <h2 class="text-xl font-bold mb-2 text-blue-400">Sistem ve Profil Ayarları</h2>
+                    <h2 class="text-xl font-bold mb-2 text-blue-400">Sistem and Profil Ayarları</h2>
                     <p class="text-xs text-slate-400 mb-6">Profilinizi bu alandan yönetebilir veya güncelleyebilirsiniz kanka.</p>
                     
                     <div class="bg-[#0f172a] p-6 rounded-2xl border border-slate-800/80 space-y-4 max-w-md">

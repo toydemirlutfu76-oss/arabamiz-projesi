@@ -1,9 +1,9 @@
 const express = require('express');
-const mysql = require('mysql2/promise');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const db = require('./db'); // Az önce jilet gibi yaptığımız db.js dosyasını kalbe bağlıyoruz kanka!
 
 const app = express();
 app.use(cors());
@@ -11,16 +11,6 @@ app.use(express.json());
 
 // Yüklenen resimlerin dışarıdan okunabilmesi için uploads klasörünü dışarı açıyoruz
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-
-// MySQL Veritabanı Bağlantı Havuzu
-// MySQL Veritabanı Bağlantı Havuzu (Render Ortam Değişkenlerine Uyarlandı kanka)
-const db = mysql.createPool({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'arabamiz_db',
-    port: process.env.DB_PORT || 3306
-});
 
 // --- MULTER DOSYA YÜKLEME AYARLARI ---
 const storage = multer.diskStorage({
@@ -40,7 +30,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // ==========================================
-// 1. YENİ İLAN EKLEME API (GÜVENLİ VE DOSYA YÜKLEMELİ)
+// 1. YENİ İLAN EKLEME API (İNTERNETE UYUMLU VE DİNAMİK)
 // ==========================================
 app.post('/api/cars', upload.fields([
     { name: 'image_file', maxCount: 1 },
@@ -57,10 +47,11 @@ app.post('/api/cars', upload.fields([
             return res.status(401).json({ error: "Kanka ilan vermek için önce giriş yapmalısın! 🛑" });
         }
 
-        const image_url = files['image_file'] ? `http://localhost:3000/uploads/${files['image_file'][0].filename}` : '';
-        const slider_img1 = files['slider_file1'] ? `http://localhost:3000/uploads/${files['slider_file1'][0].filename}` : '';
-        const slider_img2 = files['slider_file2'] ? `http://localhost:3000/uploads/${files['slider_file2'][0].filename}` : '';
-        const slider_img3 = files['slider_file3'] ? `http://localhost:3000/uploads/${files['slider_file3'][0].filename}` : '';
+        // Kanka localhost yazısını sildik, sadece dosya isimlerini kaydediyoruz ki internette de tıkır tıkır çalışsın!
+        const image_url = files['image_file'] ? files['image_file'][0].filename : '';
+        const slider_img1 = files['slider_file1'] ? files['slider_file1'][0].filename : '';
+        const slider_img2 = files['slider_file2'] ? files['slider_file2'][0].filename : '';
+        const slider_img3 = files['slider_file3'] ? files['slider_file3'][0].filename : '';
 
         const query = `INSERT INTO cars (user_id, title, brand, model, year, price, km, fuel_type, image_url, slider_img1, slider_img2, slider_img3) 
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -154,18 +145,11 @@ app.post('/api/login', async (req, res) => {
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-
-
-
-
 // --- VERİTABANINDAN İLAN SİLME ROTASI (BACKEND) ---
 app.delete('/api/cars/:id', async (req, res) => {
     const carId = req.params.id;
-    
     try {
-        // Veritabanından o ID'ye ait arabayı siliyoruz kanka
         const [result] = await db.query('DELETE FROM cars WHERE id = ?', [carId]);
-        
         if (result.affectedRows > 0) {
             res.status(200).json({ message: "İlan başarıyla silindi kanka!" });
         } else {
@@ -177,25 +161,17 @@ app.delete('/api/cars/:id', async (req, res) => {
     }
 });
 
-
-
-
-
 // --- FAVORİ EKLEME VEYA KALDIRMA (TOGGLE) API ---
 app.post('/api/favorites/toggle', async (req, res) => {
     const { user_id, car_id } = req.body;
     if (!user_id || !car_id) return res.status(400).json({ error: "Eksik bilgi kanka!" });
 
     try {
-        // Önce bu ilan zaten favoride mi diye bak kanka
         const [existing] = await db.query('SELECT * FROM favorites WHERE user_id = ? AND car_id = ?', [user_id, car_id]);
-
         if (existing.length > 0) {
-            // Varsa favorilerden kaldır kanka (Unfavorite)
             await db.query('DELETE FROM favorites WHERE user_id = ? AND car_id = ?', [user_id, car_id]);
             return res.status(200).json({ status: "removed", message: "Favorilerden kaldırıldı kanka!" });
         } else {
-            // Yoksa favorilere ekle kanka (Favorite)
             await db.query('INSERT INTO favorites (user_id, car_id) VALUES (?, ?)', [user_id, car_id]);
             return res.status(200).json({ status: "added", message: "Favorilere eklendi kanka!" });
         }
@@ -232,8 +208,6 @@ app.get('/api/favorites/details/:user_id', async (req, res) => {
     }
 });
 
-
-
-
-
-app.listen(3000, () => { console.log("🚀 Resim yükleme destekli sunucu 3000 portunda hazır kanka!"); });
+// Port dinamikleştirildi kanka Render için gerekli!
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => { console.log(`🚀 Resim yükleme destekli sunucu ${PORT} portunda hazır kanka!`); });
