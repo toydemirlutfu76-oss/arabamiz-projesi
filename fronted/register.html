@@ -86,7 +86,7 @@
             const password = document.getElementById('regPassword').value;
 
             try {
-                const response = await fetch('https://arabamiz-projesi.onrender.com', {
+                const response = await fetch('https://arabamiz-projesi.onrender.com/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name_surname, email, password })
