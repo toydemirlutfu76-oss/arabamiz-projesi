@@ -14,25 +14,35 @@ const db = {
             return [currentData];
         }
         
-        if (sql.toLowerCase().includes('insert')) {
-            // Kanka senin ön yüz formundan gelen elemanların sırasını milimetrik dizdik:
-            // params[0]: brand/title, params[1]: model, params[2]: year, params[3]: price, params[4]: km...
+       if (sql.toLowerCase().includes('insert')) {
+            const sayilar = params.filter(p => typeof p === 'number' || !isNaN(p));
+            const metinler = params.filter(p => typeof p === 'string' && isNaN(p));
+
+            // Kanka formdan gelen gerçek resmi bulmak için akıllı arama:
+            // params içindeki dosya adı olabilecek (jpg, png, avif içeren) veya link olan metni seçiyoruz
+            const gelenResim = params.find(p => typeof p === 'string' && (p.includes('.') || p.includes('/') || p.includes('http')));
+
             const newCar = {
                 id: currentData.length + 1,
                 brand: params[0] || 'BMW',
                 title: params[0] || 'BMW',
                 model: params[1] || 'M5',
                 year: params[2] || 2020,
-                // Büyük sayıyı fiyata, küçük sayıyı kilometreye zorla kanka!
                 price: params[3] ? Math.max(Number(params[3]), Number(params[4] || 0)) : 3500000,
                 km: params[4] ? Math.min(Number(params[3]), Number(params[4])) : 90000,
                 mileage: params[4] ? Math.min(Number(params[3]), Number(params[4])) : 90000,
                 fuel_type: params[5] || 'Benzin',
                 gear_type: params[6] || 'Otomatik',
-                description: params[7] || 'Çok temiz, boyasız araç.',
-                // Eğer kırık resim geliyorsa direkt varsayılan araba resmi bas kanka
-                image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'
+                description: params[7] || 'Temiz araç.',
+                // İŞTE BURASI! Eğer formdan resim geldiyse onu kullan, gelmediyse varsayılan yap kanka:
+                image_url: gelenResim || 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500',
+                image: gelenResim || 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500'
             };
+            
+            currentData.push(newCar);
+            fs.writeFileSync(jsonFilePath, JSON.stringify(currentData, null, 2), 'utf8');
+            return [{ insertId: newCar.id }];
+        }
             
             currentData.push(newCar);
             fs.writeFileSync(jsonFilePath, JSON.stringify(currentData, null, 2), 'utf8');
