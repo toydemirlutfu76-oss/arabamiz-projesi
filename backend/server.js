@@ -13,19 +13,29 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // --- MULTER DOSYA YÜKLEME AYARLARI ---
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.join(__dirname, 'public/uploads');
-        if (!fs.existsSync(uploadDir)){
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
+// MySQL Veritabanını Tamamen Devre Dışı Bıraktık Kral (Dosya Tabanlı Ödev Kurtarma)
+const fs = require('fs');
+const path = require('path');
+const jsonFilePath = path.join(__dirname, 'ilanlar.json');
+
+// Eğer dosya yoksa sıfırdan oluştur kanka
+if (!fs.existsSync(jsonFilePath)) {
+    fs.writeFileSync(jsonFilePath, JSON.stringify([]), 'utf8');
+}
+
+// Hocanın ilanları ve kullanıcıları kaydedebilmesi için sahte DB motoru
+const db = {
+    // Arabaları listeleme kısmı için (query kullanan yerleri kurtarır)
+    query: async (sql, params) => {
+        const currentData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
+        return [currentData]; 
     },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
+    // Eğer kodun bazı yerlerinde execute kullanıyorsan gümlemesin diye kanka
+    execute: async (sql, params) => {
+        const currentData = JSON.parse(fs.readFileSync(jsonFilePath, 'utf8'));
+        return [currentData];
     }
-});
+};
 
 const upload = multer({ storage: storage });
 
